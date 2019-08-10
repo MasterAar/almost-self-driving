@@ -26,7 +26,8 @@ class Rocket:
             houston.error('[rocket.Rocket.__init__] {}'.format(e))
 
     def prepare_boosters(self, permit_num, birth_date):
-        houston.info('[rocket.Rocket.prepare_boosters] entering in credentials')
+        houston.info(
+            '[rocket.Rocket.prepare_boosters] entering in credentials')
 
         time.sleep(0.5)
         road_test_link = self.site.find_element_by_link_text(
@@ -47,6 +48,45 @@ class Rocket:
         next_button = self.site.find_element_by_id("c-__NextStep")
         next_button.click()
 
+    def get_station_list(self):
+        station_list = []
+        i = 1
+
+        while 1:
+            try:
+                main_id = 'cl_c-a2-' + str(i)
+                addr_id = 'c-b2-' + str(i)
+                addr_link_id = 'cl_c-e2-' + str(i)
+                name_id = 'caption2_c-a2-' + str(i)
+                avail_xpath = '//*[@id="caption2_c-d2-{}"]/span'.format(i)
+
+                station_main = WebDriverWait(self.site, 3).until(
+                    EC.presence_of_element_located((By.ID, main_id)))
+                station_addr = self.site.find_element_by_name(addr_id)
+                station_name = station_main.find_element_by_id(name_id)
+
+                station_dict = {
+                    'Station': station_name.text,
+                    'Address': station_addr.get_attribute('value')
+                }
+
+                station_main.click()
+                station_avail = self.site.find_element(By.XPATH, avail_xpath)
+                print(station_avail)
+                # if station_avail.text = 'There are no appointments available at this location':
+                #    station_list.get(i - 1).update({'Available': None})
+
+                print('*'*100)
+                print(station_dict)
+                print('*'*100)
+                station_list.append(station_dict)
+            except:
+                i -= 1
+                houston.info(
+                    '[rocket.Rocket.scan_systems] last testing location found, index {}'.format(i))
+                break
+            i += 1
+
     def scan_systems(self, zip_code):
         houston.info(
             '[rocket.Rocket.scan_systems] scanning available testing locations')
@@ -57,18 +97,7 @@ class Rocket:
         zip_entry.send_keys(zip_code)
         zip_entry.send_keys(Keys.RETURN)
 
-        i = 1
-        while 1:
-            try:
-                station_id = 'cl_c-a2-' + str(i)
-                element = WebDriverWait(self.site, 3).until(
-                    EC.presence_of_element_located((By.ID, station_id)))
-                print(type(element))
-            except:
-                i -= 1
-                houston.info('[rocket.Rocket.scan_systems] last testing location found, index {}'.format(i))
-                break
-            i += 1
+        self.get_station_list()
 
     def takeoff(self):
         houston.info('[rocket.Rocket.takeoff] notifying user')
