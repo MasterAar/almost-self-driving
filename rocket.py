@@ -2,16 +2,22 @@ import os
 import time
 import logging as houston
 import requests
-import selenium
+from selenium import webdriver
 
 
 class Rocket:
-    def __init__(self, destination):
+    def __init__(self, destination, chromedriver_path):
         self.destination_url = destination
+        self.chromedriver_path = chromedriver_path
+        self.previous_scan = 0
 
         houston.info('rocket.Rocket.__init__ initializing webdriver')
-        # site = webdriver.Chrome()
-        # site.get(self.destination_url)
+
+        try:
+            site = webdriver.Chrome(executable_path=self.chromedriver_path)
+            site.get(self.destination_url)
+        except Exception as e:
+            houston.error('rocket.Rocket.__init__ {}'.format(e))
         # TODO: literally everything
 
     def prepare_boosters(self, permit_num, birth_date):
@@ -22,7 +28,7 @@ class Rocket:
             'rocket.Rocket.scan_systems scanning available testing locations')
         # TODO: literally everything
 
-        self.previous_scan
+        self.previous_scan = time.time()
 
     def takeoff(self):
         houston.info('rocket.Rocket.takeoff notifying user')

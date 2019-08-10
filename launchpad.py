@@ -19,13 +19,13 @@ load_dotenv()
 PERMIT_NUM = os.getenv('PERMIT_NUM')
 ZIP = os.getenv('ZIP')
 DOB = os.getenv('DOB')
-FREQ = os.getenv('FREQ')
+FREQ = int(os.getenv('FREQ'))
 DEST = os.getenv('DEST')
+CDRIVER_PATH = os.getenv('CDRIVER_PATH')
 
 houston.info('Starting main launcher')
 houston.debug(f'{PERMIT_NUM}, {ZIP}, {DOB}')
-
-r = Rocket(DEST)
+r = Rocket(DEST, CDRIVER_PATH)
 
 while 1:
     if time.time() - r.previous_scan > FREQ:
