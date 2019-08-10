@@ -11,7 +11,7 @@ handlers = [file_handler, print_handler]
 
 houston.basicConfig(
     level=houston.DEBUG,
-    format='[%(asctime)s - %(filename)s:%(lineno)d] %(levelname)s: %(message)s',
+    format='[%(asctime)s - %(levelname)s] %(message)s',
     handlers=handlers
 )
 
