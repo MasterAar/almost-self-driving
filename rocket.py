@@ -15,6 +15,9 @@ class Rocket:
         self.chromedriver_path = chromedriver_path
         self.previous_scan = 0
 
+        self.avail = 'https://driverservices.dps.mn.gov/EServices/Theme/Icon/_/Medium/Icon/Web.PendingRequests?_=795852169'
+        self.not_avail = 'https://driverservices.dps.mn.gov/EServices/Theme/Icon/_/Medium/Icon/Web.Error?_=795852169'
+
         houston.info('[rocket.Rocket.__init__] initializing webdriver')
 
         try:
@@ -34,58 +37,77 @@ class Rocket:
             "Schedule or Reschedule an Exam")
         road_test_link.click()
 
-        time.sleep(0.5)
-        permit_entry = self.site.find_element_by_id("c-8")
+        permit_entry = WebDriverWait(self.site, 3).until(
+            EC.presence_of_element_located((By.ID, "c-8")))
         permit_entry.send_keys(permit_num)
 
         dob_entry = self.site.find_element_by_id("c-9")
         dob_entry.send_keys(birth_date)
 
-        next_button = self.site.find_element_by_id("c-__NextStep")
-        next_button.click()
+        submit_button = self.site.find_element_by_id("c-__NextStep")
+        submit_button.click()
 
         time.sleep(0.5)
-        next_button = self.site.find_element_by_id("c-__NextStep")
+        next_button = WebDriverWait(self.site, 3).until(
+            EC.presence_of_element_located((By.ID, "c-__NextStep")))
         next_button.click()
 
-    def get_station_list(self):
+    def get_station_list(self, recursive, i):
         station_list = []
-        i = 1
 
         while 1:
             try:
-                main_id = 'cl_c-a2-' + str(i)
-                addr_id = 'c-b2-' + str(i)
-                addr_link_id = 'cl_c-e2-' + str(i)
-                name_id = 'caption2_c-a2-' + str(i)
-                avail_xpath = '//*[@id="caption2_c-d2-{}"]/span'.format(i)
+                main_xpath = '//*[@id="cl_c-a2-{}"]'.format(i)
+                addr_xpath = '//*[@id="c-b2-{}"]'.format(i)
+                avail_xpath = '//*[@id="caption2_c-d2-{}"]/img'.format(i)
 
+                print(main_xpath, addr_xpath, avail_xpath)
                 station_main = WebDriverWait(self.site, 3).until(
-                    EC.presence_of_element_located((By.ID, main_id)))
-                station_addr = self.site.find_element_by_name(addr_id)
-                station_name = station_main.find_element_by_id(name_id)
+                    EC.presence_of_element_located((By.XPATH, main_xpath)))
+
+                station_name = station_main.text
+
+                station_addr = self.site.find_element_by_xpath(
+                    addr_xpath).get_attribute('value')
+
+                station_avail = self.site.find_element_by_xpath(
+                    avail_xpath).get_attribute('src')
 
                 station_dict = {
-                    'Station': station_name.text,
-                    'Address': station_addr.get_attribute('value')
+                    'Station': station_name,
+                    'Address': station_addr,
+                    'Available': True if station_avail == self.avail else False
                 }
 
-                station_main.click()
-                station_avail = self.site.find_element(By.XPATH, avail_xpath)
-                print(station_avail)
-                # if station_avail.text = 'There are no appointments available at this location':
-                #    station_list.get(i - 1).update({'Available': None})
-
-                print('*'*100)
-                print(station_dict)
-                print('*'*100)
                 station_list.append(station_dict)
-            except:
-                i -= 1
                 houston.info(
-                    '[rocket.Rocket.scan_systems] last testing location found, index {}'.format(i))
+                    '[rocket.Rocket.scan_systems] added station to list')
+                print('*'*150)
+                print(station_dict)
+                print('*'*150)
+            except:
+                houston.info(
+                    '[rocket.Rocket.scan_systems] loop ended at index {}'.format(i - 1))
+                if i <= 2:
+                    houston.warning(
+                        '[rocket.Rocket.scan_systems] uncommon end index ({}), potential error occurred'.format(i - 1))
+                recursive = False
                 break
             i += 1
+
+        if recursive:
+            index = self.site.find_element_by_xpath(
+                '//*[@id="c-82_pgof"]').text
+            if int(index[0]) == 7:
+                return station_list
+
+            next_page_button = self.site.find_element_by_xpath(
+                '//*[@id="c-82_pgnext"]')
+            next_page_button.click()
+            time.sleep(0.5)
+            station_list += self.get_station_list(True, i)
+
+        return station_list
 
     def scan_systems(self, zip_code):
         houston.info(
@@ -97,7 +119,13 @@ class Rocket:
         zip_entry.send_keys(zip_code)
         zip_entry.send_keys(Keys.RETURN)
 
-        self.get_station_list()
+        self.local_station_list = self.get_station_list(False, 1)  # Local only
+
+        show_all_button = self.site.find_element_by_xpath('//*[@id="cl_c-42"]')
+        show_all_button.click()
+
+        self.full_station_list = self.get_station_list(True, 1)  # Full scan
+        print(self.full_station_list)
 
     def takeoff(self):
         houston.info('[rocket.Rocket.takeoff] notifying user')
