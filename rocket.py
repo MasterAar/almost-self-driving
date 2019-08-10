@@ -32,7 +32,7 @@ class Rocket:
         houston.info(
             '[rocket.Rocket.prepare_boosters] entering in credentials')
 
-        time.sleep(0.5)
+        time.sleep(1)
         road_test_link = self.site.find_element_by_link_text(
             "Schedule or Reschedule an Exam")
         road_test_link.click()
@@ -47,7 +47,7 @@ class Rocket:
         submit_button = self.site.find_element_by_id("c-__NextStep")
         submit_button.click()
 
-        time.sleep(0.5)
+        time.sleep(1)
         next_button = WebDriverWait(self.site, 3).until(
             EC.presence_of_element_located((By.ID, "c-__NextStep")))
         next_button.click()
@@ -57,6 +57,7 @@ class Rocket:
 
         while 1:
             try:
+                time.sleep(0.25)
                 main_xpath = '//*[@id="cl_c-a2-{}"]'.format(i)
                 addr_xpath = '//*[@id="c-b2-{}"]'.format(i)
                 avail_xpath = '//*[@id="caption2_c-d2-{}"]/img'.format(i)
@@ -64,9 +65,9 @@ class Rocket:
                 print(main_xpath, addr_xpath, avail_xpath)
                 station_main = WebDriverWait(self.site, 3).until(
                     EC.presence_of_element_located((By.XPATH, main_xpath)))
-
+                print('1')
                 station_name = station_main.text
-
+                print('2')
                 station_addr = self.site.find_element_by_xpath(
                     addr_xpath).get_attribute('value')
 
@@ -80,19 +81,21 @@ class Rocket:
                 }
 
                 station_list.append(station_dict)
+                print('*'*200)
                 houston.info(
                     '[rocket.Rocket.scan_systems] added station to list')
-                print('*'*150)
-                print(station_dict)
-                print('*'*150)
+                print(station_list)
+                print('*'*200)
             except:
+                i -= 1
                 houston.info(
-                    '[rocket.Rocket.scan_systems] loop ended at index {}'.format(i - 1))
-                if i <= 2:
+                    '[rocket.Rocket.scan_systems] loop ended at index {}'.format(i))
+                if i % 17 == 1:  # No, no, no
                     houston.warning(
-                        '[rocket.Rocket.scan_systems] uncommon end index ({}), potential error occurred'.format(i - 1))
-                recursive = False
-                break
+                        '[rocket.Rocket.scan_systems] uncommon end index ({}), potential error occurred'.format(i))
+                    recursive = False
+                if not recursive:
+                    break
             i += 1
 
         if recursive:
@@ -100,11 +103,12 @@ class Rocket:
                 '//*[@id="c-82_pgof"]').text
             if int(index[0]) == 7:
                 return station_list
-
+            print('11')
             next_page_button = self.site.find_element_by_xpath(
                 '//*[@id="c-82_pgnext"]')
             next_page_button.click()
-            time.sleep(0.5)
+            print('22')
+            time.sleep(1.5)
             station_list += self.get_station_list(True, i)
 
         return station_list
