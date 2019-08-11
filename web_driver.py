@@ -1,6 +1,6 @@
 import os
 import time
-import logging as houston
+import logging
 import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -9,7 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-class Rocket:
+class Web_Driver:
     def __init__(self, destination, chromedriver_path):
         self.destination_url = destination
         self.chromedriver_path = chromedriver_path
@@ -18,7 +18,7 @@ class Rocket:
         self.avail = 'https://driverservices.dps.mn.gov/EServices/Theme/Icon/_/Medium/Icon/Web.PendingRequests?_=795852169'
         self.not_avail = 'https://driverservices.dps.mn.gov/EServices/Theme/Icon/_/Medium/Icon/Web.Error?_=795852169'
         self.good_i = [16, 31, 46, 61, 76, 91]  # If it breaks here that's good
-        houston.info('[rocket.Rocket.__init__] initializing webdriver')
+        logging.info('[rocket.Rocket.__init__] initializing webdriver')
 
         try:
             self.site = webdriver.Chrome(
@@ -26,11 +26,11 @@ class Rocket:
             self.site.get(self.destination_url)
             # self.site.set_window_size(1200, 1000)
         except Exception as e:
-            houston.error('[rocket.Rocket.__init__] {}'.format(e))
+            logging.error('[rocket.Rocket.__init__] {}'.format(e))
 
-    def prepare_boosters(self, permit_num, birth_date):
-        houston.info(
-            '[rocket.Rocket.prepare_boosters] entering in credentials')
+    def prepare(self, permit_num, birth_date):
+        logging.info(
+            '[rocket.Rocket.prepare] entering in credentials')
 
         time.sleep(1)
         road_test_link = self.site.find_element_by_link_text(
@@ -78,30 +78,30 @@ class Rocket:
                 }
                 station_list.append(station_dict)
 
-                houston.info(
+                logging.info(
                     '[rocket.Rocket.scan_systems] added {}'.format(station_dict))
             except:
-                houston.info(
+                logging.info(
                     '[rocket.Rocket.scan_systems] loop ended at index {}'.format(i - 1))
                 if recursive and i > 91:
-                    houston.info(
+                    logging.info(
                         '[rocket.Rocket.scan_systems] end of full list detected')
                     return station_list
                 elif recursive and i in self.good_i:
-                    houston.info('[rocket.Rocket.scan_systems] recursion!')
+                    logging.info('[rocket.Rocket.scan_systems] recursion!')
                     self.site.find_element_by_xpath(
                         '//*[@id="c-82_pgnext"]').click()
                     time.sleep(1.5)
                     station_list += self.get_station_list(True, i)
                     return station_list
                 elif not recursive and i == 5:
-                    houston.info(
+                    logging.info(
                         '[rocket.Rocket.scan_systems] end of local list detected')
                     return station_list
             i += 1
 
-    def scan_systems(self, zip_code):
-        houston.info(
+    def scan_stations(self, zip_code):
+        logging.info(
             '[rocket.Rocket.scan_systems] scanning available testing locations')
         self.previous_scan = time.time()
 
@@ -110,14 +110,10 @@ class Rocket:
         zip_entry.send_keys(zip_code)
         zip_entry.send_keys(Keys.RETURN)
 
-        self.local_station_list = self.get_station_list(False, 1)  # Local only
-        print(self.local_station_list)
+        self.local_station_list = self.get_station_list(False, 1)  # LOCAL LIST
 
         self.site.find_element_by_xpath('//*[@id="cl_c-42"]').click()
 
-        self.full_station_list = self.get_station_list(True, 1)  # Full scan
-        print(self.full_station_list)
+        self.full_station_list = self.get_station_list(True, 1)  # FULL LIST
 
-    def takeoff(self):
-        houston.info('[rocket.Rocket.takeoff] notifying user')
-        # TODO: literally everything
+        return self.local_station_list, self.full_station_list

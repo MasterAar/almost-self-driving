@@ -1,16 +1,16 @@
 import os
 import sys
 import time
-import logging as houston
+import logging
 from dotenv import load_dotenv
 from rocket import Rocket
 
-file_handler = houston.FileHandler(filename='out.log')
-print_handler = houston.StreamHandler(sys.stdout)
+file_handler = logging.FileHandler(filename='out.log')
+print_handler = logging.StreamHandler(sys.stdout)
 handlers = [file_handler, print_handler]
 
-houston.basicConfig(
-    level=houston.INFO,
+logging.basicConfig(
+    level=logging.INFO,
     format='[%(asctime)s - %(levelname)s] %(message)s',
     handlers=handlers
 )
@@ -23,14 +23,14 @@ FREQ = int(os.getenv('FREQ'))
 DEST = os.getenv('DEST')
 CDRIVER_PATH = os.getenv('CDRIVER_PATH')
 
-houston.info('Starting main launcher')
-houston.debug(f'{PERMIT_NUM}, {ZIP}, {DOB}')
-r = Rocket(DEST, CDRIVER_PATH)
+logging.info('Starting main launcher')
+logging.debug(f'{PERMIT_NUM}, {ZIP}, {DOB}')
+w = Web_Driver(DEST, CDRIVER_PATH)
 
 while 1:
-    if time.time() - r.previous_scan > FREQ:
-        r.prepare_boosters(PERMIT_NUM, DOB)
+    if time.time() - w.previous_scan > FREQ:
+        w.prepare(PERMIT_NUM, DOB)
 
-        r.scan_systems(ZIP)
+        w.scan_stations(ZIP)
 
         # TODO: literally everything
