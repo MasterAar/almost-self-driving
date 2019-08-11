@@ -10,7 +10,7 @@ print_handler = houston.StreamHandler(sys.stdout)
 handlers = [file_handler, print_handler]
 
 houston.basicConfig(
-    level=houston.DEBUG,
+    level=houston.INFO,
     format='[%(asctime)s - %(levelname)s] %(message)s',
     handlers=handlers
 )

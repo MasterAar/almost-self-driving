@@ -17,14 +17,14 @@ class Rocket:
 
         self.avail = 'https://driverservices.dps.mn.gov/EServices/Theme/Icon/_/Medium/Icon/Web.PendingRequests?_=795852169'
         self.not_avail = 'https://driverservices.dps.mn.gov/EServices/Theme/Icon/_/Medium/Icon/Web.Error?_=795852169'
-
+        self.good_i = [16, 31, 46, 61, 76, 91]  # If it breaks here that's good
         houston.info('[rocket.Rocket.__init__] initializing webdriver')
 
         try:
             self.site = webdriver.Chrome(
                 executable_path=self.chromedriver_path)
             self.site.get(self.destination_url)
-            #self.site.set_window_size(1200, 1000)
+            # self.site.set_window_size(1200, 1000)
         except Exception as e:
             houston.error('[rocket.Rocket.__init__] {}'.format(e))
 
@@ -57,61 +57,48 @@ class Rocket:
 
         while 1:
             try:
-                time.sleep(0.25)
+                time.sleep(0.15)
+
                 main_xpath = '//*[@id="cl_c-a2-{}"]'.format(i)
                 addr_xpath = '//*[@id="c-b2-{}"]'.format(i)
                 avail_xpath = '//*[@id="caption2_c-d2-{}"]/img'.format(i)
 
-                print(main_xpath, addr_xpath, avail_xpath)
                 station_main = WebDriverWait(self.site, 3).until(
                     EC.presence_of_element_located((By.XPATH, main_xpath)))
-                print('1')
                 station_name = station_main.text
-                print('2')
                 station_addr = self.site.find_element_by_xpath(
                     addr_xpath).get_attribute('value')
-
                 station_avail = self.site.find_element_by_xpath(
                     avail_xpath).get_attribute('src')
 
                 station_dict = {
                     'Station': station_name,
                     'Address': station_addr,
-                    'Available': True if station_avail == self.avail else False
+                    'Available': False if 'Web.Error?' in station_avail else True
                 }
-
                 station_list.append(station_dict)
-                print('*'*200)
+
                 houston.info(
-                    '[rocket.Rocket.scan_systems] added station to list')
-                print(station_list)
-                print('*'*200)
+                    '[rocket.Rocket.scan_systems] added {}'.format(station_dict))
             except:
-                i -= 1
                 houston.info(
-                    '[rocket.Rocket.scan_systems] loop ended at index {}'.format(i))
-                if i % 17 == 1:  # No, no, no
-                    houston.warning(
-                        '[rocket.Rocket.scan_systems] uncommon end index ({}), potential error occurred'.format(i))
-                    recursive = False
-                if not recursive:
-                    break
+                    '[rocket.Rocket.scan_systems] loop ended at index {}'.format(i - 1))
+                if recursive and i > 91:
+                    houston.info(
+                        '[rocket.Rocket.scan_systems] end of full list detected')
+                    return station_list
+                elif recursive and i in self.good_i:
+                    houston.info('[rocket.Rocket.scan_systems] recursion!')
+                    self.site.find_element_by_xpath(
+                        '//*[@id="c-82_pgnext"]').click()
+                    time.sleep(1.5)
+                    station_list += self.get_station_list(True, i)
+                    return station_list
+                elif not recursive and i == 5:
+                    houston.info(
+                        '[rocket.Rocket.scan_systems] end of local list detected')
+                    return station_list
             i += 1
-
-        if recursive:
-            index = self.site.find_element_by_xpath(
-                '//*[@id="c-82_pgof"]').text
-            if int(index[0]) == 7:
-                return station_list
-            print('11')
-            next_page_button = self.site.find_element_by_xpath(
-                '//*[@id="c-82_pgnext"]')
-            next_page_button.click()
-            print('22')
-            time.sleep(1.5)
-            station_list += self.get_station_list(True, i)
-
-        return station_list
 
     def scan_systems(self, zip_code):
         houston.info(
@@ -124,9 +111,9 @@ class Rocket:
         zip_entry.send_keys(Keys.RETURN)
 
         self.local_station_list = self.get_station_list(False, 1)  # Local only
+        print(self.local_station_list)
 
-        show_all_button = self.site.find_element_by_xpath('//*[@id="cl_c-42"]')
-        show_all_button.click()
+        self.site.find_element_by_xpath('//*[@id="cl_c-42"]').click()
 
         self.full_station_list = self.get_station_list(True, 1)  # Full scan
         print(self.full_station_list)
