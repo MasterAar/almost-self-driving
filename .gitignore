@@ -106,5 +106,6 @@ venv.bak/
 # vscode local files
 .vscode
 
-# sqlite3 dbs
-stationdb.db
+# Google API
+credentials.json
+token.pickle

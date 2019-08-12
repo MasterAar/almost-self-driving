@@ -3,7 +3,7 @@ import sys
 import time
 import logging
 from dotenv import load_dotenv
-from rocket import Rocket
+from web_driver import Web_Driver
 
 file_handler = logging.FileHandler(filename='out.log')
 print_handler = logging.StreamHandler(sys.stdout)
