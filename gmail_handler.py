@@ -1,70 +1,24 @@
-from __future__ import print_function
-from dotenv import load_dotenv
-import os
-import pickle
-import base64
-import os.path
-from email.mime.text import MIMEText
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
+import google_auth_oauthlib
 
-# If modifying these scopes, delete the file token.pickle
-SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+# TODO: Create a client ID for your project.
+client_id = "YOUR-CLIENT-ID.apps.googleusercontent.com"
+client_secret = "abc_ThIsIsAsEcReT"
 
-load_dotenv()
-sender = os.getenv('EMAIL_SENDER')
-to = os.getenv('EMAIL_TO')
+# TODO: Choose the needed scopes for your applications.
+scopes = ["https://www.googleapis.com/auth/cloud-platform"]
 
+credentials = google_auth_oauthlib.get_user_credentials(
+    scopes, client_id, client_secret
+)
 
-def main():
-    """Shows basic usage of the Gmail API.
-    Lists the user's Gmail labels.
-    """
-    creds = None
-    # The file token.pickle stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
-            creds = pickle.load(token)
-    # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
-            creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
+# 1. Open the link.
+# 2. Authorize the application to have access to your account.
+# 3. Copy and paste the authorization code to the prompt.
 
-    service = build('gmail', 'v1', credentials=creds)
-    return service
+# Use the credentials to construct a client for Google APIs.
+from google.cloud import bigquery
 
-
-def create_message(sender, to, subject, message_text):
-    message = MIMEText(message_text)
-    message['to'] = to
-    message['from'] = sender
-    message['subject'] = subject
-    return {'raw': base64.urlsafe_b64encode(message.as_string())}
-
-
-def send_message(service, user_id, message):
-    try:
-        message = (service.users().messages().send(
-            userId=user_id, body=message).execute())
-        print('Message Id: %s' % message['id'])
-        return message
-    except error:
-        print('An error occurred: %s' % error)
-
-
-api_service = main()
-
-print('sending email now:')
-
-send_message(api_service, sender, create_message(
-    sender, to, 'Hi', 'Hello, World!'))
+bigquery_client = bigquery.Client(
+    credentials=credentials, project="almost-self-driving"
+)
+print(list(bigquery_client.query("SELECT 1").result()))
