@@ -1,11 +1,13 @@
+# NOT FUNCTIONAL, PRETTY BROKEN CURRENTLY
+
 import google_auth_oauthlib
 
 # TODO: Create a client ID for your project.
-client_id = "YOUR-CLIENT-ID.apps.googleusercontent.com"
+client_id = "almost-self-driving-249803.apps.googleusercontent.com"
 client_secret = "abc_ThIsIsAsEcReT"
 
-# TODO: Choose the needed scopes for your applications.
-scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+
+scopes = ["email profile openid"]
 
 credentials = google_auth_oauthlib.get_user_credentials(
     scopes, client_id, client_secret
