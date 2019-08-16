@@ -1,12 +1,13 @@
+import logging
 import os
 import time
-import logging
+
 import requests
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 class Web_Driver:
@@ -18,7 +19,7 @@ class Web_Driver:
         self.avail = 'https://driverservices.dps.mn.gov/EServices/Theme/Icon/_/Medium/Icon/Web.PendingRequests?_=795852169'
         self.not_avail = 'https://driverservices.dps.mn.gov/EServices/Theme/Icon/_/Medium/Icon/Web.Error?_=795852169'
         self.good_i = [16, 31, 46, 61, 76, 91]  # If it breaks here that's good
-        logging.info('[rocket.Rocket.__init__] initializing webdriver')
+        logging.info('[web_driver.Web_Driver.__init__] initializing webdriver')
 
         try:
             self.site = webdriver.Chrome(
@@ -26,11 +27,14 @@ class Web_Driver:
             self.site.get(self.destination_url)
             # self.site.set_window_size(1200, 1000)
         except Exception as e:
-            logging.error('[rocket.Rocket.__init__] {}'.format(e))
+            logging.error('[web_driver.Web_Driver.__init__] {}'.format(e))
+    
+    def close(self):
+        self.site.quit()
 
     def prepare(self, permit_num, birth_date):
         logging.info(
-            '[rocket.Rocket.prepare] entering in credentials')
+            '[web_driver.Web_Driver.prepare] entering in credentials')
 
         time.sleep(1)
         road_test_link = self.site.find_element_by_link_text(
@@ -79,16 +83,17 @@ class Web_Driver:
                 station_list.append(station_dict)
 
                 logging.info(
-                    '[rocket.Rocket.scan_systems] added {}'.format(station_dict))
+                    '[web_driver.Web_Driver.scan_systems] added {}'.format(station_dict))
             except:
                 logging.info(
-                    '[rocket.Rocket.scan_systems] loop ended at index {}'.format(i - 1))
+                    '[web_driver.Web_Driver.scan_systems] loop ended at index {}'.format(i - 1))
                 if recursive and i > 91:
                     logging.info(
-                        '[rocket.Rocket.scan_systems] end of full list detected')
+                        '[web_driver.Web_Driver.scan_systems] end of full list detected')
                     return station_list
                 elif recursive and i in self.good_i:
-                    logging.info('[rocket.Rocket.scan_systems] recursion!')
+                    logging.info(
+                        '[web_driver.Web_Driver.scan_systems] recursion!')
                     self.site.find_element_by_xpath(
                         '//*[@id="c-82_pgnext"]').click()
                     time.sleep(1.5)
@@ -96,13 +101,13 @@ class Web_Driver:
                     return station_list
                 elif not recursive and i == 5:
                     logging.info(
-                        '[rocket.Rocket.scan_systems] end of local list detected')
+                        '[web_driver.Web_Driver.scan_systems] end of local list detected')
                     return station_list
             i += 1
 
     def scan_stations(self, zip_code):
         logging.info(
-            '[rocket.Rocket.scan_systems] scanning available testing locations')
+            '[web_driver.Web_Driver.scan_systems] scanning available testing locations')
         self.previous_scan = time.time()
 
         time.sleep(0.5)
