@@ -30,9 +30,10 @@ CDRIVER_PATH = os.getenv('CDRIVER_PATH')
 logging.info('Starting main launcher')
 logging.debug(f'{PERMIT_NUM}, {ZIP}, {DOB}')
 
+prev_scan_time = 0
 
 while 1:
-    if time.time() - w.previous_scan > FREQ:
+    if time.time() - prev_scan_time > FREQ:
         w = Web_Driver(DEST, CDRIVER_PATH)
         time.sleep(0.5)
         w.prepare(PERMIT_NUM, DOB)
@@ -66,4 +67,7 @@ while 1:
 
             print(body)
             comms.send_email("DRIVER'S TEST LOCATIONS", body)
+
+        prev_scan_time = w.previous_scan
+        w.close()
     time.sleep(1)
