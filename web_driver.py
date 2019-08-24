@@ -22,13 +22,19 @@ class Web_Driver:
         logging.info('[web_driver.Web_Driver.__init__] initializing webdriver')
 
         try:
+            options = webdriver.ChromeOptions()
+            options.add_argument('headless')
             self.site = webdriver.Chrome(
-                executable_path=self.chromedriver_path)
+                chrome_options=options, executable_path=self.chromedriver_path)
+
+            # self.site = webdriver.Chrome(
+            #    executable_path=self.chromedriver_path)
+
             self.site.get(self.destination_url)
             # self.site.set_window_size(1200, 1000)
         except Exception as e:
             logging.error('[web_driver.Web_Driver.__init__] {}'.format(e))
-    
+
     def close(self):
         self.site.quit()
 

@@ -35,6 +35,7 @@ prev_scan_time = 0
 while 1:
     if time.time() - prev_scan_time > FREQ:
         w = Web_Driver(DEST, CDRIVER_PATH)
+
         time.sleep(0.5)
         w.prepare(PERMIT_NUM, DOB)
         local_list, full_list = w.scan_stations(ZIP)
