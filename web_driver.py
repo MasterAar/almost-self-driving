@@ -23,7 +23,7 @@ class Web_Driver:
 
         try:
             options = webdriver.ChromeOptions()
-            options.add_argument('headless')
+            #options.add_argument('headless')
             self.site = webdriver.Chrome(
                 chrome_options=options, executable_path=self.chromedriver_path)
 
@@ -71,23 +71,37 @@ class Web_Driver:
 
                 main_xpath = '//*[@id="cl_c-a2-{}"]'.format(i)
                 addr_xpath = '//*[@id="c-b2-{}"]'.format(i)
-                avail_xpath = '//*[@id="caption2_c-d2-{}"]/img'.format(i)
+                #avail_xpath = '//*[@id="caption2_c-c2-{}"]/img'.format(i)
+                avail_xpath = '//*[@id="caption2_c-c2-{}"]/span'.format(i)
+                
 
                 station_main = WebDriverWait(self.site, 3).until(
                     EC.presence_of_element_located((By.XPATH, main_xpath)))
+                
                 station_name = station_main.text
+                
                 station_addr = self.site.find_element_by_xpath(
                     addr_xpath).get_attribute('value')
-                station_avail = self.site.find_element_by_xpath(
-                    avail_xpath).get_attribute('src')
+                
+                station_avail = self.site.find_element_by_xpath(avail_xpath).get_attribute("innerHTML")
+                
+                if station_avail.find('Appointment on ') == -1:
+                    station_avail_b = False
+                else:
+                    station_avail_b = True
+                
+                logging.info('///////////////////////////////////////////////////////////////////////////////////////')
+                logging.info(station_avail_b)
+                logging.info(station_avail)
+                logging.info(avail_xpath)
+                logging.info('///////////////////////////////////////////////////////////////////////////////////////')
 
                 station_dict = {
                     'Station': station_name,
                     'Address': station_addr,
-                    'Available': False if 'Web.Error?' in station_avail else True
+                    'Available': station_avail_b
                 }
                 station_list.append(station_dict)
-
                 logging.info(
                     '[web_driver.Web_Driver.scan_systems] added {}'.format(station_dict))
             except:
