@@ -18,17 +18,17 @@ class Web_Driver:
 
         self.avail = 'https://driverservices.dps.mn.gov/EServices/Theme/Icon/_/Medium/Icon/Web.PendingRequests?_=795852169'
         self.not_avail = 'https://driverservices.dps.mn.gov/EServices/Theme/Icon/_/Medium/Icon/Web.Error?_=795852169'
-        self.good_i = [16, 31, 46, 61, 76, 91]  # If it breaks here that's good
+        # If it breaks here that's good, usually
+        self.good_i = [16, 31, 46, 61, 76, 91]
         logging.info('[web_driver.Web_Driver.__init__] initializing webdriver')
 
         try:
             options = webdriver.ChromeOptions()
-            #options.add_argument('headless')
+            options.add_argument('headless')
             self.site = webdriver.Chrome(
                 chrome_options=options, executable_path=self.chromedriver_path)
 
-            # self.site = webdriver.Chrome(
-            #    executable_path=self.chromedriver_path)
+            #self.site = webdriver.Chrome(executable_path=self.chromedriver_path)
 
             self.site.get(self.destination_url)
             # self.site.set_window_size(1200, 1000)
@@ -71,35 +71,28 @@ class Web_Driver:
 
                 main_xpath = '//*[@id="cl_c-a2-{}"]'.format(i)
                 addr_xpath = '//*[@id="c-b2-{}"]'.format(i)
-                #avail_xpath = '//*[@id="caption2_c-c2-{}"]/img'.format(i)
+                avail_xpath_button = '//*[@id="cl_c-a2-{}"]'.format(i)
                 avail_xpath = '//*[@id="caption2_c-c2-{}"]/span'.format(i)
-                
 
                 station_main = WebDriverWait(self.site, 3).until(
                     EC.presence_of_element_located((By.XPATH, main_xpath)))
-                
+
                 station_name = station_main.text
-                
+
                 station_addr = self.site.find_element_by_xpath(
                     addr_xpath).get_attribute('value')
-                
-                station_avail = self.site.find_element_by_xpath(avail_xpath).get_attribute("innerHTML")
-                
-                if station_avail.find('Appointment on ') == -1:
-                    station_avail_b = False
-                else:
-                    station_avail_b = True
-                
-                logging.info('///////////////////////////////////////////////////////////////////////////////////////')
-                logging.info(station_avail_b)
-                logging.info(station_avail)
-                logging.info(avail_xpath)
-                logging.info('///////////////////////////////////////////////////////////////////////////////////////')
+
+                self.site.find_element_by_xpath(avail_xpath_button).click()
+                time.sleep(1)
+                station_avail = self.site.find_element_by_xpath(
+                    avail_xpath).is_displayed()
+
+                # logging.info(station_avail)
 
                 station_dict = {
                     'Station': station_name,
                     'Address': station_addr,
-                    'Available': station_avail_b
+                    'Available': station_avail
                 }
                 station_list.append(station_dict)
                 logging.info(
