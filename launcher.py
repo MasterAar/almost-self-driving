@@ -55,10 +55,10 @@ while 1:
             if station['Available']:
                 available_list.append(station)
 
-        if len(available_list) == 0:
-            for station in full_list:
-                if station['Available']:
-                    available_list.append(station)
+        #if len(available_list) == 0:
+        #    for station in full_list:
+        #        if station['Available']:
+        #            available_list.append(station)
 
         if len(available_list) > 0:
             body = f'There are {len(available_list)} stations available!\n\n'
