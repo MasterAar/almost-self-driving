@@ -8,7 +8,7 @@ ZIP=55XXX
 DOB=010170
 FREQ=1800
 DEST=https://driverservices.dps.mn.gov/EServices/_/
-CDRIVER_PATH=./chromedriver/chromedriver
+CDRIVER_PATH=./chromedriver/
 EMAIL_SENDER=johnsmith@gmail.com
 EMAIL_TO=johnsmithofficial@gmail.com
 ```
