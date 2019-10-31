@@ -30,4 +30,5 @@ apt-get install -y libglib2.0-0=2.50.3-2 \
     libgconf-2-4=3.2.6-4+b1 \
     libfontconfig1=2.11.0-6.7+b1
     
-    ```
+```
+if that doesn't work then try installing chromium and it probablly uses the same libraries
