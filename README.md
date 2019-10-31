@@ -17,6 +17,10 @@ EMAIL_TO=johnsmithofficial@gmail.com
 - `EMAIL_SENDER` is the email that notifications are sent from. This email needs to be configured with a Google API.
 - `EMAIL_TO` is the email that notifications are sent to. This does *not need to be configued for anything.*
 
+
+note that linux uses forward slashes like a reasonable human being instead of those retarted backslashes so feel free to add proper filepaths
+
+
 If you have any questions, please contact Aaron (MasterAar). This is poorly built code, and will probably fail on other machines.
 
 ## Linux specific rubbish
