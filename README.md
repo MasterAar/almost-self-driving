@@ -8,7 +8,7 @@ ZIP=55XXX
 DOB=010170
 FREQ=1800
 DEST=https://driverservices.dps.mn.gov/EServices/_/
-CDRIVER_PATH=./chromedriver/
+CDRIVER_PATH=./chromedriver 
 EMAIL_SENDER=johnsmith@gmail.com
 EMAIL_TO=johnsmithofficial@gmail.com
 ```
@@ -27,14 +27,11 @@ the chromedriver excecutable is a whiny slank and requires both excecutable perm
 run these commands from the root of the project directory, use sudo -s if you have to
 
 ```
-chmod 775 ./chromedriver/
+chmod 775 ./chromedriver
 
 pip3 install google-api-python-client google-auth-oauthlib google-auth requests python-dotenv
 
-apt-get install -y libglib2.0-0=2.50.3-2 \
-    libnss3=2:3.26.2-1.1+deb9u1 \
-    libgconf-2-4=3.2.6-4+b1 \
-    libfontconfig1=2.11.0-6.7+b1
+apt-get install -y libglib2.0-0 libnss3 libgconf-2-4 libfontconfig
     
 ```
 if that doesn't work then try installing chromium and it probablly uses the same libraries
