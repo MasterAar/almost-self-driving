@@ -27,7 +27,7 @@ the chromedriver excecutable is a whiny slank and requires both excecutable perm
 run these commands from the root of the project directory, use sudo -s if you have to
 
 ```
-chmod 775 ./chromedriver/chromedriver
+chmod 775 ./chromedriver/
 
 pip3 install google-api-python-client google-auth-oauthlib google-auth requests python-dotenv
 
