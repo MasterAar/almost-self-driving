@@ -1,5 +1,6 @@
 # almost-self-driving
-Automation of Minnesota's road test registration. Searches for available testing stations and notifies the user of any availability via email (currently).
+Automation of Minnesota's road test registration. Searches for available testing stations and notifies the user of any availability via email (currently). Because of a lack of time, I will not write that much documentation, especially concerning the Google/Gmail API, however a brief summary of the environment variables are described below.
+When executed, the script will only email the user when necessary, that is, when the stations nearby one's ZIP code are available. As I passed the test already, I cannot help with development of this program anymore, but feel free to add on more features (say, listing stations by distance from the user's current location, or auto-signing up after verifying that there are open spots).
 ## Setting up .env
 Here's an example env file:
 ```
