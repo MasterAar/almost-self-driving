@@ -55,10 +55,10 @@ while 1:
             if station['Available']:
                 available_list.append(station)
 
-        #if len(available_list) == 0:
-        #    for station in full_list:
-        #        if station['Available']:
-        #            available_list.append(station)
+        if len(available_list) == 0:
+            for station in full_list:
+                if station['Available'] and station['Station'] == 'Hastings Exam Station':
+                    available_list.append(station)
 
         if len(available_list) > 0:
             body = f'There are {len(available_list)} stations available!\n\n'
@@ -71,4 +71,5 @@ while 1:
 
         prev_scan_time = w.previous_scan
         w.close()
-    time.sleep(1)
+    time.sleep(10)
+    logging.debug('tick')
