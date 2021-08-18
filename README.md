@@ -18,4 +18,4 @@ EMAIL_TO=johnsmithofficial@gmail.com
 - `EMAIL_SENDER` is the email that notifications are sent from. This email needs to be configured with a Google API.
 - `EMAIL_TO` is the email that notifications are sent to. This does *not need to be configued for anything.*
 
-If you have any questions, please contact Aaron (MasterAar). This is poorly built code, and will probably fail on other machines.
+If you have any questions, please contact Aaron. This is poorly built code, and will probably fail on other machines.
